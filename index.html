@@ -173,9 +173,17 @@ td.hit{background:var(--ns2)!important;color:#fff;border-radius:6px}
 html{scroll-behavior:smooth}
 .col{scroll-margin-top:12px}
 .jump{display:none;margin-left:auto;gap:6px}
-.jump a{font-size:14px;font-weight:700;text-decoration:none;padding:7px 14px;border-radius:9px;color:#fff;background:var(--k0)}
-.jump a+a{background:var(--k2)}
-@media (max-width:900px){.jump{display:flex}}
+.jump button{font:inherit;font-size:16px;font-weight:800;border:2px solid var(--line);background:var(--card);color:var(--muted);
+  padding:9px 0;border-radius:11px;cursor:pointer;flex:1}
+body.show2 .jump button[data-show="2"]{background:var(--k0);border-color:var(--k0);color:#fff}
+body.show4 .jump button[data-show="4"]{background:var(--k2);border-color:var(--k2);color:#fff}
+@media (max-width:900px){
+  header{position:sticky;top:0;z-index:20;background:var(--bg);padding-top:10px;padding-bottom:10px;border-bottom:1px solid var(--line);isolation:isolate}
+  header h1{font-size:16px}
+  .jump{display:flex;width:100%;margin-left:0}
+  body.show2 #col4, body.show4 #col2{display:none}
+  .colhead{display:none}
+}
 @media (max-width:620px){
   .col .t8{gap:3px}.col .t8 .tile{padding:7px 0 6px;border-radius:7px}
   .col .t8 .tile b{font-size:13px;letter-spacing:-.02em}
@@ -187,7 +195,7 @@ html{scroll-behavior:smooth}
 <body>
 <header>
   <h1><span>nord</span> program change</h1>
-  <div class="jump"><a href="#col2">NS2</a><a href="#col4">NS4</a></div>
+  <div class="jump"><button type="button" data-show="2">NS2</button><button type="button" data-show="4">NS4</button></div>
 </header>
 
 <main>
@@ -412,6 +420,15 @@ highlight();
 </script>
 <script>
 if("serviceWorker" in navigator){addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}));}
+</script>
+<script>
+(function(){
+  let v="2"; try{v=localStorage.getItem("nordpc-show")||"2";}catch(e){}
+  const show=x=>{document.body.classList.toggle("show2",x==="2");document.body.classList.toggle("show4",x==="4");
+    try{localStorage.setItem("nordpc-show",x);}catch(e){} scrollTo(0,0);};
+  document.querySelectorAll(".jump button").forEach(b=>b.onclick=()=>show(b.dataset.show));
+  show(v);
+})();
 </script>
 </body>
 </html>
