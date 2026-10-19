@@ -1,0 +1,417 @@
+<!doctype html>
+<html lang="fr-CA">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icon-512.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Nord PC">
+<meta name="theme-color" content="#c8102e">
+<title>Nord Program Change</title>
+<style>
+:root{
+  --bg:#f4f1ec; --card:#ffffff; --ink:#1d1b19; --muted:#6f6a63; --line:#e2ddd5;
+  --red:#c8102e; --red-soft:#fbe9ec; --ns2:#c8102e; --ns4:#1f5fa8; --ns4-soft:#e6eef8;
+  --field:#f7f5f1;
+  --k0:#c8102e; --k1:#e8590c; --k2:#1f5fa8; --k3:#0a8a84;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#141312; --card:#1e1c1a; --ink:#f1ede7; --muted:#a39d94; --line:#34302c;
+    --red:#ff4d5e; --red-soft:#3a1d21; --ns2:#ff4d5e; --ns4:#5b9bea; --ns4-soft:#1a2738;
+    --field:#272421;
+    --k0:#ff4d5e; --k1:#ff8a3d; --k2:#5b9bea; --k3:#33c2b8;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#141312; --card:#1e1c1a; --ink:#f1ede7; --muted:#a39d94; --line:#34302c;
+  --red:#ff4d5e; --red-soft:#3a1d21; --ns2:#ff4d5e; --ns4:#5b9bea; --ns4-soft:#1a2738;
+  --field:#272421;
+  --k0:#ff4d5e; --k1:#ff8a3d; --k2:#5b9bea; --k3:#33c2b8;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);
+  font-family:-apple-system,BlinkMacSystemFont,"Helvetica Neue",Helvetica,Arial,sans-serif;
+  -webkit-tap-highlight-color:transparent}
+header{display:flex;align-items:center;gap:16px;flex-wrap:wrap;padding:16px 20px 0;max-width:1200px;margin:0 auto}
+h1{font-size:20px;margin:0;letter-spacing:.02em}
+h1 span{color:var(--red)}
+nav{display:flex;gap:4px;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:4px;margin-left:auto}
+nav button{border:0;background:transparent;color:var(--muted);font:inherit;font-size:15px;font-weight:600;
+  padding:9px 16px;border-radius:9px;cursor:pointer}
+nav button.on{background:var(--ink);color:var(--bg)}
+main{max-width:1200px;margin:0 auto;padding:16px 20px 40px}
+.tab{display:none}.tab.on{display:block}
+
+/* convertisseurs */
+.grid4{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.col{display:flex;flex-direction:column;gap:16px}
+.colhead{font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.12em;margin:4px 2px 0}
+.colhead.ns2{color:var(--ns2)}.colhead.ns4{color:var(--ns4)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px;border-top:4px solid var(--cc);transition:box-shadow .2s}
+.card.target{box-shadow:0 0 0 2px var(--cc)}
+.tgt{display:none;font-size:11px;font-weight:700;color:var(--cc);white-space:nowrap;order:3}
+.card.target .tgt{display:inline}
+.card.flash{animation:flash .5s}
+@keyframes flash{0%{background:color-mix(in srgb,var(--cc) 18%,var(--card))}100%{background:var(--card)}}
+.cardtop{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+.tag{font-size:12px;font-weight:700;padding:3px 8px;border-radius:6px;background:color-mix(in srgb,var(--cc) 14%,var(--card));color:var(--cc);white-space:nowrap}
+.cardtop input{flex:1;min-width:0;border:0;border-bottom:1px dashed var(--line);background:transparent;color:var(--ink);
+  font:inherit;font-size:16px;padding:4px 2px;outline:none}
+.cardtop input:focus{border-bottom-color:var(--ink)}
+.halves{display:grid;grid-template-columns:1fr auto 1fr;gap:12px;align-items:stretch}
+.half{background:var(--field);border-radius:12px;padding:12px;display:flex;flex-direction:column;gap:10px}
+.half h3{margin:0;font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.1em}
+.arrow{align-self:center;color:var(--muted);font-size:20px}
+.row{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.row label{font-size:14px;color:var(--muted);min-width:56px}
+.step{display:flex;align-items:center;border:1px solid var(--line);border-radius:10px;background:var(--card);overflow:hidden}
+.step button{width:38px;height:40px;border:0;background:transparent;color:var(--ink);font-size:20px;cursor:pointer;touch-action:manipulation}
+.step button:active{background:var(--line)}
+.step input{width:52px;height:40px;border:0;border-left:1px solid var(--line);border-right:1px solid var(--line);
+  text-align:center;font:inherit;font-size:18px;font-weight:700;background:transparent;color:var(--ink);outline:none;
+  -moz-appearance:textfield;font-variant-numeric:tabular-nums}
+.step input::-webkit-outer-spin-button,.step input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
+.big{font-size:30px;font-weight:800;text-align:center;letter-spacing:.03em;font-variant-numeric:tabular-nums;padding:2px 0}
+.big small{display:block;font-size:12px;font-weight:500;color:var(--muted);letter-spacing:0}
+.fld{width:100%;border:2px solid var(--line);border-radius:12px;background:var(--card);color:var(--ink);
+  font:inherit;font-size:30px;font-weight:800;text-align:center;padding:10px 8px;outline:none;letter-spacing:.03em;
+  font-variant-numeric:tabular-nums;text-transform:uppercase}
+.fld::placeholder{font-size:15px;font-weight:400;color:var(--muted);text-transform:none;letter-spacing:0}
+.fld:focus{border-color:var(--ink)}
+.card .fld:focus{border-color:var(--cc)}
+.fld.bad{border-color:#d98a00;background:color-mix(in srgb,#d98a00 10%,var(--card))}
+.det{font-size:13px;color:var(--muted);text-align:center;min-height:18px}
+.det span{opacity:.75}.det em{font-style:normal;color:#d98a00}
+.note{font-size:13px;color:var(--muted);margin:18px 2px 0;line-height:1.5}
+
+/* tableaux */
+.tables{margin-top:8px}
+.tables h2{font-size:16px;margin:0 0 4px}
+.tables p.sub{margin:0 0 10px;color:var(--muted);font-size:14px}
+table{border-collapse:separate;border-spacing:0;font-variant-numeric:tabular-nums}
+th,td{text-align:center;padding:7px 10px;font-size:15px;border-bottom:1px solid var(--line)}
+th{font-size:12px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.06em}
+td.pg{font-weight:700;color:var(--muted);text-align:right}
+td.v{font-weight:600}
+tbody tr:nth-child(even) td{background:var(--field)}
+td.hit{background:var(--ns2)!important;color:#fff;border-radius:6px}
+.ns4t td.hit{background:var(--ns4)!important}
+.tablecard{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px;overflow-x:auto}
+.ns2wrap{display:grid;grid-template-columns:repeat(4,max-content);gap:24px}
+.banks{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:16px}
+.bankhead{display:flex;align-items:baseline;gap:10px;margin-bottom:6px}
+.bankhead b{font-size:22px;color:var(--ns4)}
+.bankhead span{font-size:13px;color:var(--muted)}
+.ns4t table{width:100%}
+.ns4t th,.ns4t td{padding:5px 3px;font-size:14px}
+
+
+.pagegrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:10px}
+.pagecard{display:flex;align-items:center;gap:12px;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:10px 12px}
+#bankview{display:grid;gap:8px}
+.pagelbl{width:42px;flex:none;text-align:center;font-size:24px;font-weight:800;line-height:1}
+.pagelbl span{display:block;font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;margin-bottom:2px}
+.tiles{display:grid;gap:6px;flex:1}.t5{grid-template-columns:repeat(5,minmax(0,1fr))}.t8{grid-template-columns:repeat(8,minmax(0,1fr))}
+.tile{min-width:0}
+.tile{border-radius:9px;padding:7px 2px 5px;text-align:center;background:color-mix(in srgb,var(--c) 11%,var(--card));
+  border:1px solid color-mix(in srgb,var(--c) 28%,transparent);font-variant-numeric:tabular-nums}
+.tile b{display:block;font-size:19px;line-height:1.1}
+.tile small{display:block;font-size:10.5px;color:var(--muted);margin-top:2px;white-space:nowrap}
+.tile{cursor:pointer;transition:transform .08s}
+.tile:hover{border-color:var(--c)}.tile:active{transform:scale(.94)}
+.tile.hit{background:var(--hc);border-color:transparent;color:#fff;box-shadow:0 0 0 2px var(--card),0 0 0 4px var(--ink)}
+.tile.hit small{color:rgba(255,255,255,.85)}
+.pills{display:grid;grid-template-columns:repeat(8,1fr);gap:6px;margin-bottom:12px}
+.pill{position:relative;border:2px solid color-mix(in srgb,var(--c) 45%,transparent);background:var(--card);color:var(--ink);
+  border-radius:12px;padding:8px 0 6px;cursor:pointer;font:inherit}
+.pill b{display:block;font-size:22px;color:var(--c)}.pill small{font-size:11px;color:var(--muted)}
+.pill.on{background:var(--c);border-color:var(--c)}.pill.on b,.pill.on small{color:#fff}
+.pill.has::after{content:"";position:absolute;top:6px;right:7px;width:8px;height:8px;border-radius:50%;background:var(--ink)}
+.pill.on.has::after{background:#fff}
+.bankbanner{display:flex;align-items:center;gap:14px;background:var(--c);color:#fff;border-radius:14px;padding:12px 16px;margin-bottom:4px}
+.bl{font-size:44px;font-weight:900;line-height:1}
+.bt{font-size:18px;font-weight:700}.bs{font-size:14px;opacity:.9}
+@media (max-width:620px){.pills{grid-template-columns:repeat(4,1fr)}.t8 .tile small{display:none}.tile b{font-size:16px}.pagecard{gap:8px;padding:8px}}
+
+.pagelbl{background:var(--ink);color:var(--bg);border-radius:10px;padding:6px 0 7px;width:54px}
+.pagelbl span{color:var(--bg);opacity:.65}
+.pagelbl.ghost{background:transparent;padding:0;height:0}
+.pagecard{background:transparent;border:0;border-bottom:1px solid var(--line);border-radius:0;padding:8px 0}
+.pagecard:last-child{border-bottom:0}
+.proghead{display:flex;gap:12px;align-items:end;padding:0 0 2px}
+.proghead .tiles div{text-align:center;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}
+.pgroup{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:12px 14px}
+.pagegrid{grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:12px}
+#bankview{gap:0;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:0 14px 6px;overflow:hidden}
+#bankview .bankbanner{margin:0 -14px 10px;border-radius:0}
+@media (max-width:620px){.pagelbl{width:44px}.proghead{gap:8px}.proghead .tiles div{font-size:11px}.proghead .w{display:none}}
+
+.tile{position:relative}
+.tile.hit::after{content:attr(data-who);position:absolute;top:-9px;left:50%;transform:translateX(-50%);white-space:nowrap;
+  background:var(--ink);color:var(--bg);font-size:10px;font-weight:700;padding:1px 6px;border-radius:6px}
+.col .t8 .tile b{font-size:16px}.col .t8 .tile small{font-size:9.5px}.col .t8{gap:4px}
+.col .pill small{font-size:10px}
+.col .t5 .w{display:none}.col .t5 .tile b{font-size:17px}.col .t5{gap:5px}
+.col .pagegrid .pagelbl{width:46px}
+
+.tile i{display:none;font-style:normal;font-size:9.5px;font-weight:700;line-height:1.1;margin-top:2px;padding:0 2px;
+  overflow:hidden;overflow-wrap:break-word;-webkit-line-clamp:2;-webkit-box-orient:vertical;color:var(--c)}
+.tile.named small{display:none}.tile.named i{display:-webkit-box}
+.tile.hit i{color:#fff}
+.cardtop input:disabled{opacity:.4}
+@media (max-width:900px){.grid4{grid-template-columns:1fr}.ns2wrap{grid-template-columns:repeat(2,max-content)}}
+@media (max-width:520px){
+  header,main{padding-left:16px;padding-right:16px}
+  nav{margin-left:0;width:100%}nav button{flex:1;padding:9px 6px}
+  .halves{grid-template-columns:1fr}.arrow{display:none}
+  .banks{grid-template-columns:1fr}
+  .ns2wrap{grid-template-columns:max-content}
+}
+
+html{scroll-behavior:smooth}
+.col{scroll-margin-top:12px}
+.jump{display:none;margin-left:auto;gap:6px}
+.jump a{font-size:14px;font-weight:700;text-decoration:none;padding:7px 14px;border-radius:9px;color:#fff;background:var(--k0)}
+.jump a+a{background:var(--k2)}
+@media (max-width:900px){.jump{display:flex}}
+@media (max-width:620px){
+  .col .t8{gap:3px}.col .t8 .tile{padding:7px 0 6px;border-radius:7px}
+  .col .t8 .tile b{font-size:13px;letter-spacing:-.02em}
+  .col .t8 .tile i{font-size:8.5px}
+  .pagelbl{width:40px}.pagelbl span{font-size:8px}
+}
+</style>
+</head>
+<body>
+<header>
+  <h1><span>nord</span> program change</h1>
+  <div class="jump"><a href="#col2">NS2</a><a href="#col4">NS4</a></div>
+</header>
+
+<main>
+  <div class="grid4">
+    <div class="col" id="col2">
+      <div class="colhead ns2">Nord Stage 2</div><div id="c0"></div>
+      <div class="tables">
+        <p class="sub">Bloc foncé = page · colonnes = programmes · gros chiffre = program change.</p>
+        <div class="pagegrid" id="ns2tables"></div>
+      </div>
+    </div>
+    <div class="col" id="col4">
+      <div class="colhead ns4">Nord Stage 4</div><div id="c2"></div>
+      <div class="tables">
+        <p class="sub">Choisis la banque (couleurs par paires de même LSB). Bloc foncé = page · colonnes = programmes.</p>
+        <div id="ns4tables"></div>
+      </div>
+    </div>
+  </div>
+  <p class="note">Tape comme ça te vient : <b>11</b>, <b>1.1</b>, <b>205</b> pour le NS2 ; <b>a28</b>, <b>a.2.8</b>, <b>C:3:5</b> pour le NS4 (sans lettre, la banque actuelle est gardée). Côté MIDI du NS4 : juste le PC, ou <b>LSB:PC</b> (ex. <b>1:18</b>). Program change de 0 à 127 ; si ton logiciel compte de 1 à 128, ajoute 1. Le patch choisi est surligné dans le tableau. Clique une pastille du tableau pour remplir la case du dessus. Vide un champ pour enlever le surlignage. Le dernier patch choisi reste en mémoire dans ce navigateur.</p>
+</main>
+
+<script>
+const BANKS = "ABCDEFGH";
+const store = {
+  get(k){ try{ return JSON.parse(localStorage.getItem(k)); }catch(e){ return null; } },
+  set(k,v){ try{ localStorage.setItem(k, JSON.stringify(v)); }catch(e){} }
+};
+const clamp=(v,a,b)=>Math.min(b,Math.max(a,v));
+
+/* ---------- conversions ---------- */
+const NS2 = {
+  toPC:s=>(s.page-1)*5+(s.prog-1),
+  fromPC:pc=>({page:Math.floor(pc/5)+1, prog:pc%5+1})
+};
+const NS4 = {
+  toPC:s=>({lsb:Math.floor(s.bank/2), pc:(s.bank%2)*64+(s.page-1)*8+(s.prog-1)}),
+  fromPC:(lsb,pc)=>{const r=pc%64;return {bank:lsb*2+Math.floor(pc/64), page:Math.floor(r/8)+1, prog:r%8+1};}
+};
+
+/* ---------- lecture souple de ce qui est tapé ---------- */
+// sépare "28" -> [2,8], "205" -> [20,5], "2.8" / "2:8" / "2 8" -> [2,8], "7" -> [7] (programme 1 par défaut)
+function pageProg(str, maxPage, maxProg){
+  const nums=(str.match(/\d+/g)||[]).map(Number);
+  const raw=(str.match(/\d+/g)||[]);
+  if(!nums.length) return null;
+  let page, prog, partiel=false;
+  if(nums.length>=2){ page=nums[0]; prog=nums[1]; }
+  else{
+    const d=raw[0];
+    if(d.length>=2){ page=+d.slice(0,-1); prog=+d.slice(-1);
+      if(!(prog>=1&&prog<=maxProg) && +d<=maxPage){ page=+d; prog=1; partiel=true; } }
+    else { page=+d; prog=1; partiel=true; }
+  }
+  if(page<1||page>maxPage||prog<1||prog>maxProg) return null;
+  return {page,prog,partiel};
+}
+const parse = {
+  ns2patch:str=>pageProg(str,20,5),
+  ns2midi:str=>{const n=(str.match(/\d+/g)||[]).map(Number); if(n.length!==1||n[0]>99) return null; return {pc:n[0]};},
+  ns4patch:(str,cur)=>{
+    const L=str.match(/[a-h]/i); const bank=L?BANKS.indexOf(L[0].toUpperCase()):cur.bank;
+    if(/[i-z]/i.test(str)) return null;
+    const pp=pageProg(str,8,8); if(!pp) return null;
+    return {bank,page:pp.page,prog:pp.prog,partiel:pp.partiel};
+  },
+  ns4midi:(str,cur)=>{
+    const n=(str.match(/\d+/g)||[]).map(Number);
+    let lsb,pc;
+    if(n.length>=2){lsb=n[0];pc=n[1];} else if(n.length===1){lsb=cur.lsb;pc=n[0];} else return null;
+    if(lsb>3||pc>127) return null; return {lsb,pc};
+  }
+};
+
+/* ---------- carte ---------- */
+function makeCard(slot, model, n){
+  const key="nordpc-"+slot;
+  const saved=store.get(key)||{};
+  const el=document.getElementById("c"+slot);
+  el.className="card "+(model===4?"ns4":"")+" k"+slot;
+  el.style.setProperty("--cc",`var(--k${slot})`);
+  const phP=model===2?"ex. 11, 1.1, 205":"ex. a28, a.2.8, C:3:5";
+  const phM=model===2?"ex. 42":"ex. 18, ou 1:18 (LSB:PC)";
+  el.innerHTML=`<div class="cardtop"><span class="tag">Nord Stage ${model}</span></div>
+    <div class="halves">
+      <div class="half"><h3>Patch</h3><input class="fld p" placeholder="${phP}" autocomplete="off" autocorrect="off" autocapitalize="characters" spellcheck="false"><div class="det p"></div></div>
+      <div class="arrow">⇄</div>
+      <div class="half"><h3>MIDI</h3><input class="fld m" placeholder="${phM}" autocomplete="off" autocorrect="off" spellcheck="false" ${model===2?'inputmode="numeric"':''}><div class="det m"></div></div>
+    </div>`;
+  const fP=el.querySelector(".fld.p"), fM=el.querySelector(".fld.m");
+  const dP=el.querySelector(".det.p"), dM=el.querySelector(".det.m");
+
+  // état courant
+  let st = model===2 ? {pc:saved.pc??0} : {lsb:saved.lsb??0, pc:saved.pc??0};
+  let has = saved.pc!=null;
+  const patchOf=()=> model===2 ? NS2.fromPC(st.pc) : NS4.fromPC(st.lsb,st.pc);
+  const txtP=()=>{const p=patchOf(); return model===2?`${p.page}:${p.prog}`:`${BANKS[p.bank]}:${p.page}:${p.prog}`;};
+  const txtM=()=> model===2?`${st.pc}`:`${st.lsb}:${st.pc}`;
+  const nkey=()=> model===2?`ns2-${st.pc}`:`ns4-${st.lsb}-${st.pc}`;
+  const details=(note)=>{
+    if(!has){dP.innerHTML="";dM.innerHTML="";return;}
+    const p=patchOf();
+    dP.innerHTML = (model===2?`page ${p.page} · programme ${p.prog}`:`banque ${BANKS[p.bank]} · page ${p.page} · prog ${p.prog}`)+(note?` <em>${note}</em>`:"");
+    dM.innerHTML = model===2?`PC ${st.pc} <span>(${st.pc+1} si 1 à 128)</span>`
+                            :`LSB ${st.lsb} · PC ${st.pc} <span>(${st.pc+1} si 1 à 128)</span>`;
+  };
+  const save=()=>{store.set(key,has?{...st}:{}); highlight();};
+
+  fP.addEventListener("input",()=>{
+    const r = model===2 ? parse.ns2patch(fP.value) : parse.ns4patch(fP.value, patchOf());
+    fP.classList.toggle("bad", !!fP.value.trim() && !r);
+    if(!r) return;
+    if(model===2) st.pc=NS2.toPC(r); else st=NS4.toPC(r); has=true;
+    if(model===4) showBank(r.bank);
+    fM.value=txtM(); fM.classList.remove("bad");
+    details(r.partiel?"(programme 1 par défaut)":""); save();
+  });
+  fM.addEventListener("input",()=>{
+    const r = model===2 ? parse.ns2midi(fM.value) : parse.ns4midi(fM.value, st);
+    fM.classList.toggle("bad", !!fM.value.trim() && !r);
+    if(!r) return;
+    st = model===2 ? {pc:r.pc} : {lsb:r.lsb, pc:r.pc}; has=true;
+    if(model===4) showBank(patchOf().bank);
+    fP.value=txtP(); fP.classList.remove("bad");
+    details(""); save();
+  });
+  // à la sortie du champ (ou Entrée), on remet l'écriture propre
+  [fP,fM].forEach(f=>{
+    f.addEventListener("focus",()=>f.select());
+    f.addEventListener("keydown",e=>{if(e.key==="Enter")f.blur();});
+    f.addEventListener("blur",()=>{
+      if(!fP.value.trim()&&!fM.value.trim()){has=false;details("");save();return;}
+      if(!has) return;
+      fP.value=txtP(); fM.value=txtM(); fP.classList.remove("bad"); fM.classList.remove("bad");});
+  });
+
+
+  if(has){fP.value=txtP(); fM.value=txtM();} details("");
+  const who=`NS${model}`;
+  const g=()=>{if(!has) return null; const p=patchOf(); return model===2?{model:2,pc:st.pc,who,slot}:{model:4,bank:p.bank,pc:st.pc,who,slot};};
+  // remplir la case à partir d'un clic dans le tableau
+  g.load=(pc,lsb)=>{
+    st = model===2 ? {pc} : {lsb,pc}; has=true;
+    fP.value=txtP(); fM.value=txtM(); fP.classList.remove("bad"); fM.classList.remove("bad");
+    details(""); save();
+    el.classList.remove("flash"); void el.offsetWidth; el.classList.add("flash");
+  };
+  return g;
+}
+/* ---------- tableaux ---------- */
+const LSBCOL=["#e0682b","#2b9a6e","#7a5bd6","#c23a8a"]; // une couleur par LSB (A-B, C-D, E-F, G-H)
+const names=store.get("nordpc-names")||{};
+function tile(main, sub, attr, color, nk){
+  return `<div class="tile" ${attr} data-nk="${nk}" style="--c:${color}"><b>${main}</b><small>${sub}</small><i></i></div>`;
+}
+function paintNames(){
+  document.querySelectorAll(".tile[data-nk]").forEach(t=>{
+    /* noms retirés */
+  });
+}
+function buildNS2(){
+  const wrap=document.getElementById("ns2tables"); let h="";
+  const head=`<div class="proghead"><div class="pagelbl ghost"></div><div class="tiles t5">${[1,2,3,4,5].map(i=>`<div><span class="w">Prog </span>${i}</div>`).join("")}</div></div>`;
+  for(let page=1;page<=20;page++){
+    if((page-1)%5===0) h+=`<div class="pgroup">`+head;
+    h+=`<div class="pagecard"><div class="pagelbl"><span>Page</span>${page}</div><div class="tiles t5">`;
+    for(let prog=1;prog<=5;prog++){const pc=NS2.toPC({page,prog});h+=tile(pc,`${page}:${prog}`,`data-ns2="${pc}"`,"var(--ns2)",`ns2-${pc}`);}
+    h+=`</div></div>`;
+    if(page%5===0) h+=`</div>`;
+  }
+  wrap.innerHTML=h;
+}
+let shownBank=0;
+function buildNS4(){
+  const wrap=document.getElementById("ns4tables");
+  let h=`<div class="pills">`;
+  for(let b=0;b<8;b++){const l=Math.floor(b/2);
+    h+=`<button class="pill" data-b="${b}" style="--c:${LSBCOL[l]}"><b>${BANKS[b]}</b><small>LSB ${l}</small></button>`;}
+  h+=`</div><div id="bankview"></div>`;
+  wrap.innerHTML=h;
+  wrap.querySelectorAll(".pill").forEach(p=>p.onclick=()=>showBank(+p.dataset.b));
+}
+function showBank(b){
+  shownBank=b; const l=Math.floor(b/2), c=LSBCOL[l], base=(b%2)*64;
+  document.querySelectorAll(".pill").forEach(p=>p.classList.toggle("on",+p.dataset.b===b));
+  let h=`<div class="bankbanner" style="--c:${c}"><div class="bl">${BANKS[b]}</div>
+    <div><div class="bt">Banque ${BANKS[b]}</div><div class="bs">Bank Select LSB <b>${l}</b> · PC <b>${base}</b> à <b>${base+63}</b></div></div></div>
+    <div class="proghead"><div class="pagelbl ghost"></div><div class="tiles t8">${[1,2,3,4,5,6,7,8].map(i=>`<div><span class="w">Prog </span>${i}</div>`).join("")}</div></div>`;
+  for(let page=1;page<=8;page++){
+    h+=`<div class="pagecard"><div class="pagelbl"><span>Page</span>${page}</div><div class="tiles t8">`;
+    for(let prog=1;prog<=8;prog++){const pc=NS4.toPC({bank:b,page,prog}).pc;
+      h+=tile(pc,`${BANKS[b]}:${page}:${prog}`,`data-ns4="${b}-${pc}"`,c,`ns4-${l}-${pc}`);}
+    h+=`</div></div>`;
+  }
+  document.getElementById("bankview").innerHTML=h; paintNames(); highlight();
+}
+/* surligne dans les tableaux les patchs choisis dans le convertisseur */
+let getters=[];
+function highlight(){
+  document.querySelectorAll(".hit").forEach(td=>{td.classList.remove("hit");td.removeAttribute("data-who");td.style.removeProperty("--hc");td.removeAttribute("data-k");});
+  getters.forEach(g=>{const s=g(); if(!s) return;
+    const td=s.model===2?document.querySelector(`[data-ns2="${s.pc}"]`):document.querySelector(`[data-ns4="${s.bank}-${s.pc}"]`);
+    if(td){
+      const prev=td.dataset.k;
+      td.classList.add("hit");td.dataset.who=prev!=null?td.dataset.who+" + "+s.who:s.who;
+      td.style.setProperty("--hc", prev!=null?`linear-gradient(135deg,var(--k${prev}) 50%,var(--k${s.slot}) 50%)`:`var(--k${s.slot})`);
+      td.dataset.k=s.slot;
+    }});
+  document.querySelectorAll(".pill").forEach(p=>p.classList.toggle("has",
+    getters.some(g=>{const s=g();return s&&s.model===4&&s.bank===+p.dataset.b;})));
+}
+
+buildNS2(); buildNS4(); showBank(0); paintNames();
+document.addEventListener("click",e=>{
+  const t=e.target.closest(".tile"); if(!t) return;
+  if(t.dataset.ns2!=null){ getters[0].load(+t.dataset.ns2); }
+  else if(t.dataset.ns4){ const [b,pc]=t.dataset.ns4.split("-").map(Number); getters[1].load(pc,Math.floor(b/2)); }
+});
+getters=[makeCard(0,2,1),makeCard(2,4,1)];
+highlight();
+{const s=getters[1](); if(s) showBank(s.bank);}
+</script>
+<script>
+if("serviceWorker" in navigator){addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}));}
+</script>
+</body>
+</html>
